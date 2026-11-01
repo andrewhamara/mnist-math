@@ -1,3 +1,3 @@
-from plugin.read_image import read_image
+from plugin.read_images import read_images
 
-__all__ = ["read_image"]
+__all__ = ["read_images"]

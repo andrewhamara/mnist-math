@@ -8,12 +8,12 @@ from slimconfig import Output
 
 
 class Tool(Enum):
-    READ_IMAGE = "read_image"
+    READ_IMAGES = "read_images"
 
 
 class Task(Enum):
     DIGIT_MATH = "digit-math"
-    SHOW_IMAGE = "show-image"
+    SHOW_IMAGES = "show-images"
 
 
 class Operator(Enum):
@@ -30,16 +30,23 @@ ROWS = (
 
 
 @dataclass
-class ImageInput(Output):
-    image: Annotated[int, IMAGE]
+class ImagesInput(Output):
+    images: Annotated[list[int], "One or two images' numbers, 1 to 100, e.g. [4, 8]; the same image may appear twice"]
 
 
 @dataclass
-class ImageOutput(Output):
+class DigitImage(Output):
     image: Annotated[int, IMAGE]
-    width: Annotated[int, "The image's width in pixels"]
-    height: Annotated[int, "The image's height in pixels"]
     rows: Annotated[list[str], ROWS]
+
+
+@dataclass
+class ImagesOutput(Output):
+    width: Annotated[int, "Each image's width in pixels"]
+    height: Annotated[int, "Each image's height in pixels"]
+    # Not named images: NanoAgent shows a tool output's images field to the model as pictures, which
+    # RUSH Lab's model cannot take; these are text.
+    pictures: Annotated[list[DigitImage], "The images' pixels as text, in the order asked for"]
 
 
 @dataclass
@@ -62,9 +69,9 @@ class MathOutput(Output):
 
 
 TOOLS = {
-    Tool.READ_IMAGE: (ImageInput, ImageOutput),
+    Tool.READ_IMAGES: (ImagesInput, ImagesOutput),
 }
 TASKS = {
     Task.DIGIT_MATH: (MathInput, MathOutput),
-    Task.SHOW_IMAGE: (ImageInput, ImageOutput),
+    Task.SHOW_IMAGES: (ImagesInput, ImagesOutput),
 }

@@ -12,19 +12,21 @@ which nothing the agent can reach has, and checks each digit and the result.
 
 | Tool | Does | Code |
 |---|---|---|
-| `read_image` | Gives an image's 28x28 pixels as 28 rows of text: `.` for blank paper, then `:` `-` `=` `+` `*` `#` `%` `@` for ink from faintest to darkest. It does not know, and never says, which digit the image shows | `src/plugin/read_image.py` |
+| `read_images` | Gives one or two images' 28x28 pixels as 28 rows of text each: `.` for blank paper, then `:` `-` `=` `+` `*` `#` `%` `@` for ink from faintest to darkest. It does not know, and never says, which digit an image shows | `src/plugin/read_images.py` |
 
 ### Tasks
 
 | Task | Does | Runner |
 |---|---|---|
-| `digit-math` | Reads the digits in two images and adds, subtracts or multiplies them, e.g. "multiply the digits in images 4 and 8" | `agent`, with `read_image`; no reference (the verifier holds the labels) |
-| `show-image` | Shows one image and the text of its pixels the agent reads | `tool` (`read_image`) |
+| `digit-math` | Reads the digits in two images and adds, subtracts or multiplies them, e.g. "multiply the digits in images 4 and 8" | `agent`, with `read_images`; no reference (the verifier holds the labels) |
+| `show-images` | Shows one or two images and the text of their pixels the agent reads | `tool` (`read_images`) |
 
 The page shows the images themselves (`ui/renderers.js`): `digit-math` with
 both images, the digit the agent read under each, MNIST's label beside a
-wrong one, the arithmetic and the verdict's checks; `show-image` with the
-image and its text.
+wrong one, the arithmetic and the verdict's checks. The agent reads both
+images in one `read_images` call, whose card shows both, so the page's Result
+tab shows the two images asked for even when the agent ends without an
+answer; `show-images` shows them the same way, with their text.
 
 ## The task
 
@@ -33,7 +35,7 @@ The input is two image numbers, 1 to 100, and an operator: `add`
 `multiply` (first × second). The agent submits the question as given, the two
 digits it read, and the result of the operator applied to them.
 
-Unlike a detector that names what it sees, `read_image` hands over the raw
+Unlike a detector that names what it sees, `read_images` hands over the raw
 pixels: this is the agent's perception task. Here is image 4, as the agent
 gets it:
 
@@ -94,7 +96,7 @@ constraint it needs did not hold.
 Valid only when all 7 hold, with score 1.0. Any failure of 1 to 3 scores 0.
 Otherwise each digit read right is worth 0.25 and the right result 0.5, at
 most 0.99. Constraint 4 tells a reading mistake from an arithmetic mistake.
-`read_image`'s every output is checked too: its rows must be the image's
+`read_images`'s every output is checked too: its rows must be each image's
 pixels, character for character.
 
 ## Limitations
@@ -124,9 +126,9 @@ under the MIT license in `LICENSE`.
 ├── uv.lock
 ├── .gitignore
 ├── .env             # needed environment variable names (none here)
-├── src/plugin/      # the MCP server (__main__.py), read_image.py, and tools_dev/make_digits.py
+├── src/plugin/      # the MCP server (__main__.py), read_images.py, and tools_dev/make_digits.py
 ├── tests/           # the tool, the verifier, and scripted agents (an exact one, and one that reads the text)
-├── ui/              # digits/ (the 100 PNGs, which read_image reads and the page shows) and
+├── ui/              # digits/ (the 100 PNGs, which read_images reads and the page shows) and
 │                    #   renderers.js/.css (the images on the result cards)
 ├── product/         # the product page a catalog shows: product.yaml and icon.svg
 └── verifier/        # deterministic verifier: digits.py (the labels and rows), one module per tool,

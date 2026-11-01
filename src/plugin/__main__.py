@@ -13,14 +13,14 @@ from mcp.server.stdio import stdio_server
 from slimconfig import build_output, output_schema, plain_output
 
 from contract import TOOLS, Tool
-from plugin import read_image
+from plugin import read_images
 
 server = Server("mnist-math")
 # NanoAgent names the one folder this plugin may write to.
 WORKSPACE_ENV = "NANOAGENT_WORKSPACE"
 # Each tool's implementation: (its input, the workspace) -> its output, as contract.TOOLS types them.
 IMPLEMENTATIONS = {
-    Tool.READ_IMAGE: read_image,
+    Tool.READ_IMAGES: read_images,
 }
 
 

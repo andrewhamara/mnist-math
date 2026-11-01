@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from contract import ImageInput
-from plugin import read_image
-from plugin.read_image import INK, as_text
+from contract import ImagesInput
+from plugin import read_images
+from plugin.read_images import INK, as_text
 from verifier.digits import LABELS, ROWS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,9 +16,23 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.mark.parametrize("number", range(1, 101))
 def test_gives_each_images_pixels_as_its_rows(tmp_path: Path, number: int) -> None:
-    found = read_image(ImageInput(image=number), tmp_path)
-    assert (found.width, found.height) == (28, 28) and found.rows == list(ROWS[number])
-    assert all(len(row) == 28 and set(row) <= set(INK) for row in found.rows)
+    found = read_images(ImagesInput(images=[number]), tmp_path)
+    assert (found.width, found.height) == (28, 28) and [item.image for item in found.pictures] == [number]
+    rows = found.pictures[0].rows
+    assert rows == list(ROWS[number]) and all(len(row) == 28 and set(row) <= set(INK) for row in rows)
+
+
+def test_gives_two_images_in_the_order_asked_and_the_same_image_twice(tmp_path: Path) -> None:
+    found = read_images(ImagesInput(images=[8, 4]), tmp_path)
+    assert [(item.image, item.rows) for item in found.pictures] == [(8, list(ROWS[8])), (4, list(ROWS[4]))]
+    twice = read_images(ImagesInput(images=[6, 6]), tmp_path)
+    assert [item.image for item in twice.pictures] == [6, 6]
+
+
+@pytest.mark.parametrize("images", [[], [1, 2, 3]])
+def test_refuses_other_than_one_or_two_images(tmp_path: Path, images: list[int]) -> None:
+    with pytest.raises(ValueError, match="one or two images"):
+        read_images(ImagesInput(images=images), tmp_path)
 
 
 def test_ten_images_of_each_digit() -> None:
@@ -28,7 +42,7 @@ def test_ten_images_of_each_digit() -> None:
 @pytest.mark.parametrize("number", [0, 101, -1])
 def test_refuses_an_image_that_is_not_bundled(tmp_path: Path, number: int) -> None:
     with pytest.raises(ValueError, match="no image"):
-        read_image(ImageInput(image=number), tmp_path)
+        read_images(ImagesInput(images=[4, number]), tmp_path)
 
 
 def test_ink_levels_run_from_blank_to_darkest() -> None:

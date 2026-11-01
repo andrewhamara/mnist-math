@@ -21,7 +21,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from plugin.read_image import COUNT, DIGITS, SIDE, as_text
+from plugin.read_images import COUNT, DIGITS, SIDE, as_text
 
 ROOT = Path(__file__).resolve().parents[3]
 TRUTH = ROOT / "verifier" / "digits.py"
@@ -70,7 +70,7 @@ def main() -> None:
                 raise SystemExit(f"{path} does not hold MNIST test image {index} exactly")
             truth.append((number, labels[index], index, as_text(saved)))
     lines = [
-        '"""Each bundled image\'s MNIST label, its index in the MNIST test set, and its rows as read_image gives',
+        '"""Each bundled image\'s MNIST label, its index in the MNIST test set, and its rows as read_images gives',
         'them, as src/plugin/tools_dev/make_digits.py wrote them. Generated: do not edit."""',
         "",
         f"COUNT = {COUNT}",

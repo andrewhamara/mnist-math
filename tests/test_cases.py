@@ -1,7 +1,7 @@
-"""Scripted agents, no model, each run as NanoAgent runs the task: read_image, then submit.
+"""Scripted agents, no model, each run as NanoAgent runs the task: read_images, then submit.
 
 An exact agent, which knows MNIST's labels, must pass every question. A reading agent sees only what
-the model sees, read_image's text: it takes each digit from the most similar text among the other 99
+the model sees, read_images's text: it takes each digit from the most similar text among the other 99
 images (leave-one-out nearest neighbor). Its verdicts must agree with whether it read right, and it
 shows that the text alone carries the digit.
 """
@@ -13,16 +13,16 @@ from pathlib import Path
 import pytest
 from helpers import judge
 
-from contract import ImageInput
-from plugin import read_image
-from plugin.read_image import INK
+from contract import ImagesInput
+from plugin import read_images
+from plugin.read_images import INK
 from verifier.digits import LABELS
 
 OPERATORS = {"add": lambda a, b: a + b, "subtract": lambda a, b: a - b, "multiply": lambda a, b: a * b}
 
 
 def ink(number: int) -> list[int]:
-    rows = read_image(ImageInput(image=number), Path(".")).rows
+    rows = read_images(ImagesInput(images=[number]), Path(".")).pictures[0].rows
     return [INK.index(char) for row in rows for char in row]
 
 
@@ -60,5 +60,5 @@ def test_a_reading_agent_is_judged_by_what_it_read(operator: str) -> None:
 
 def test_the_text_alone_carries_the_digit() -> None:
     correct = sum(READ[n] == LABELS[n] for n in READ)
-    print(f"leave-one-out nearest neighbor on read_image's text reads {correct} of 100 digits right")
+    print(f"leave-one-out nearest neighbor on read_images's text reads {correct} of 100 digits right")
     assert correct >= 70

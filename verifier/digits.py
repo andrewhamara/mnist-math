@@ -1,4 +1,4 @@
-"""Each bundled image's MNIST label, its index in the MNIST test set, and its rows as read_image gives
+"""Each bundled image's MNIST label, its index in the MNIST test set, and its rows as read_images gives
 them, as src/plugin/tools_dev/make_digits.py wrote them. Generated: do not edit."""
 
 COUNT = 100

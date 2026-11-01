@@ -7,8 +7,8 @@ from helpers import checks, image_of, judge
 from slimconfig import build_output, plain_output
 
 import verifier
-from contract import TASKS, TOOLS, ImageInput, Task, Tool
-from plugin import read_image
+from contract import TASKS, TOOLS, ImagesInput, Task, Tool
+from plugin import read_images
 from verifier.digits import LABELS
 
 # Correct
@@ -102,28 +102,30 @@ def test_an_image_that_does_not_exist_scores_zero(first: int, second: int) -> No
 # Tool calls
 
 
-def test_checks_read_image_calls() -> None:
-    def verify_input(number: int) -> bool:
-        return verifier.verify_input("read_image", build_output({"image": number}, TOOLS[Tool.READ_IMAGE][0]))["valid"]
+def test_checks_read_images_calls() -> None:
+    def verify_input(images: list[int]) -> bool:
+        return verifier.verify_input("read_images", build_output({"images": images}, TOOLS[Tool.READ_IMAGES][0]))["valid"]
 
-    assert verify_input(1) and verify_input(100) and not verify_input(0) and not verify_input(101)
+    assert verify_input([1]) and verify_input([100, 4]) and verify_input([6, 6])
+    assert not verify_input([0]) and not verify_input([4, 101]) and not verify_input([]) and not verify_input([1, 2, 3])
 
-    def verify_output(number: int, made: dict) -> dict:
-        given, output = TOOLS[Tool.READ_IMAGE]
-        return verifier.verify_output("read_image", build_output({"image": number}, given), build_output(made, output), ".")
+    def verify_output(images: list[int], made: dict) -> dict:
+        given, output = TOOLS[Tool.READ_IMAGES]
+        return verifier.verify_output("read_images", build_output({"images": images}, given), build_output(made, output), ".")
 
-    found = plain_output(read_image(ImageInput(image=4), Path(".")))
-    assert verify_output(4, found)["valid"] is True
-    altered = found | {"rows": [*found["rows"][:10], "@" * 28, *found["rows"][11:]]}
-    assert "row 11 differs" in verify_output(4, altered)["message"]
-    assert verify_output(5, found)["valid"] is False
-    assert verify_output(4, found | {"rows": found["rows"][:27]})["valid"] is False
+    found = plain_output(read_images(ImagesInput(images=[4, 8]), Path(".")))
+    assert verify_output([4, 8], found)["valid"] is True
+    rows = found["pictures"][1]["rows"]
+    altered = found | {"pictures": [found["pictures"][0], {"image": 8, "rows": [*rows[:10], "@" * 28, *rows[11:]]}]}
+    assert "image 8's rows are not its pixels: row 11 differs" in verify_output([4, 8], altered)["message"]
+    assert verify_output([8, 4], found)["valid"] is False
+    assert verify_output([4], found)["valid"] is False
 
 
-def test_the_show_image_task_is_judged_as_its_tool() -> None:
-    found = plain_output(read_image(ImageInput(image=8), Path(".")))
-    given, made = TASKS[Task.SHOW_IMAGE]
-    verdict = verifier.verify_task("show-image", build_output({"image": 8}, given), build_output(found, made), None, ".")
+def test_the_show_images_task_is_judged_as_its_tool() -> None:
+    found = plain_output(read_images(ImagesInput(images=[8]), Path(".")))
+    given, made = TASKS[Task.SHOW_IMAGES]
+    verdict = verifier.verify_task("show-images", build_output({"images": [8]}, given), build_output(found, made), None, ".")
     assert verdict["valid"] is True
 
 

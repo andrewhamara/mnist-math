@@ -6,10 +6,10 @@ plugin's tool shows an image's pixels and never knows its digit.
 
 from contract import Task, Tool
 
-from . import read_image, task
+from . import read_images, task
 
 TOOLS = {
-    Tool.READ_IMAGE: read_image,
+    Tool.READ_IMAGES: read_images,
 }
 
 
@@ -21,7 +21,7 @@ def _tool_output(module):
 # task -> its output's check, verify_task(arguments, output, reference, workspace)
 TASKS = {
     Task.DIGIT_MATH: task.verify_task,
-    Task.SHOW_IMAGE: _tool_output(read_image),
+    Task.SHOW_IMAGES: _tool_output(read_images),
 }
 
 

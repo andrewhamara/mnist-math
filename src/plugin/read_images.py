@@ -1,4 +1,4 @@
-"""read_image: a bundled image's pixels as text, for an agent to read the digit from. It never says which
+"""read_images: one or two bundled images' pixels as text, for an agent to read the digit from. It never says which
 digit the image shows; the plugin does not know: only the verifier holds MNIST's labels.
 
 Each pixel, 0 (blank paper) to 255 (darkest ink), becomes one character by its ink level in nine
@@ -12,7 +12,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from contract import ImageInput, ImageOutput
+from contract import DigitImage, ImagesInput, ImagesOutput
 
 # The images live in ui/digits/, where the plugin's page shows them too.
 DIGITS = Path(__file__).resolve().parents[2] / "ui" / "digits"
@@ -44,6 +44,9 @@ def _rows(number: int) -> tuple[str, ...]:
         return tuple(as_text(image))
 
 
-def read_image(given: ImageInput, workspace: Path) -> ImageOutput:
-    """The image's pixels as 28 rows of text."""
-    return ImageOutput(image=given.image, width=SIDE, height=SIDE, rows=list(_rows(given.image)))
+def read_images(given: ImagesInput, workspace: Path) -> ImagesOutput:
+    """Each image's pixels as 28 rows of text, in the order asked for."""
+    if not 1 <= len(given.images) <= 2:
+        raise ValueError(f"ask for one or two images, not {len(given.images)}")
+    pictures = [DigitImage(image=number, rows=list(_rows(number))) for number in given.images]
+    return ImagesOutput(width=SIDE, height=SIDE, pictures=pictures)

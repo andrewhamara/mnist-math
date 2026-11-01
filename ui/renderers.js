@@ -1,7 +1,7 @@
 // How this plugin's page draws its tasks' outputs: the digit images themselves (ui/digits/), drawn
 // large with their pixels kept sharp. A digit-math answer shows both images with the digit the agent
 // read under each (and MNIST's label beside a wrong one), the arithmetic, and the verdict's checks;
-// show-image shows one image and the text of its pixels that the agent reads.
+// read_images and show-images show every image asked for, with the text of its pixels the agent reads.
 import { disclosure, h } from "./kit/components.js";
 
 const SYMBOLS = { add: "+", subtract: "−", multiply: "×" };
@@ -45,12 +45,19 @@ function tile(n, read, truth) {
 }
 
 export default {
-  ImageOutput: ({ image, rows }) =>
+  ImagesOutput: ({ pictures }) =>
     h(
       "div",
       { class: "digit-card" },
-      h("div", { class: "digit-pair" }, h("figure", { class: "digit-tile" }, digitImage(image), h("figcaption", { class: "muted", text: `Image ${image}` }))),
-      disclosure({ summary: "The text the agent reads", className: "digit-text" }, h("pre", { class: "digit-rows", text: rows.join("\n") })),
+      h(
+        "div",
+        { class: "digit-pair" },
+        pictures.map(({ image }) => h("figure", { class: "digit-tile" }, digitImage(image), h("figcaption", { class: "muted", text: `Image ${image}` }))),
+      ),
+      disclosure(
+        { summary: "The text the agent reads", className: "digit-text" },
+        pictures.map(({ image, rows }) => h("div", {}, h("p", { class: "muted", text: `Image ${image}` }), h("pre", { class: "digit-rows", text: rows.join("\n") }))),
+      ),
     ),
   MathOutput: ({ first, second, operator, first_digit, second_digit, result }, { verdict }) => {
     const details = verdict.details || {};
