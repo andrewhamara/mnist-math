@@ -1,0 +1,30 @@
+/* Styles for this plugin's renderers (renderers.js): digit images drawn large with sharp pixels. They
+   apply only inside each renderer's output, in its own shadow root, and use the kit's variables, so
+   they follow the host's light and dark themes; an image keeps MNIST's black background. */
+
+.digit-card { display: grid; gap: 10px; min-width: 0; }
+.digit-pair { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 18px; }
+.digit-tile { margin: 0; display: grid; justify-items: center; gap: 6px; }
+.digit-img {
+  width: 140px; height: 140px; image-rendering: pixelated; background: #000;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+}
+.digit-tile.wrong .digit-img { border-color: var(--bad); }
+.digit-tile figcaption { display: grid; justify-items: center; gap: 1px; font-size: 13px; }
+.digit-read strong { font-size: 16px; }
+.digit-truth { color: var(--bad); font-weight: 600; font-size: 12.5px; }
+.digit-op { font-size: 30px; font-weight: 600; color: var(--muted); margin-top: 50px; }
+.digit-sum { font-size: 20px; }
+.digit-answer { font-size: 13.5px; }
+
+.digit-checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 13px; }
+.digit-check { display: grid; grid-template-columns: 1.2em 1fr; gap: 6px; }
+.digit-check code { font-size: 12px; }
+.digit-mark { font-weight: 700; text-align: center; }
+.digit-check.ok .digit-mark { color: var(--ok); }
+.digit-check.bad .digit-mark { color: var(--bad); }
+.digit-check.skipped { color: var(--muted); }
+.digit-why { display: block; color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+
+.digit-text { font-size: 13px; }
+.digit-rows { margin: 6px 0 0; font-size: 11px; line-height: 1.05; letter-spacing: 1px; overflow-x: auto; }

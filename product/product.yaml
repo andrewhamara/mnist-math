@@ -1,0 +1,11 @@
+_ > nanoagent.plugin.v0001.ProductConfig:
+tagline: "Handwriting arithmetic: the agent reads two MNIST digits from their raw pixels and does the math"
+summary: "Name two of 100 handwritten digit images from MNIST and an operation, such as multiply the digits in images 4 and 8. Nothing recognizes the digits for the agent: its only tool turns an image's pixels into 28 rows of text, one character per pixel by how dark the ink is, and the agent must read each digit from the shape of the ink, then add, subtract or multiply. The verifier holds MNIST's own labels, which nothing the agent can reach has, and checks each digit and the result."
+highlights:
+  - "The agent does the seeing: 28x28 pixels as text, no detector, no hints"
+  - "100 real MNIST handwritten digits, ten of each, numbered in shuffled order"
+  - "7 checks per answer: each digit read, the agent's own arithmetic, and the result, with partial credit"
+steps:
+  - "Ask to see an image, such as show me image 4: its picture and the text the agent reads"
+  - "Ask for arithmetic on two images, such as multiply the digits in images 4 and 8"
+  - "See both images, the digits the agent read beside the true ones, the result, and every check of the verdict"

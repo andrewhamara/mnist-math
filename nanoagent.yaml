@@ -1,0 +1,40 @@
+_ > nanoagent.plugin.v0001.ManifestConfig:
+id: mnist-math
+name: MNIST Math
+version: 0.1.0
+status: ready
+spec: nanoagent.plugin/v0001
+
+runtime > nanoagent.plugin.v0001.RuntimeConfig:
+  type: mcp_stdio
+  command: [uv, run, --frozen, python, -m, plugin]
+
+permissions > nanoagent.plugin.v0001.PermissionsConfig:
+  network > nanoagent.plugin.v0001.NetworkConfig:
+    hosts: []
+  filesystem > nanoagent.plugin.v0001.FilesystemConfig:
+    write: [workspace]
+
+# One entry per contract.Tool; its input and output classes are contract.TOOLS's.
+tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
+  read_image:
+    description: Give a bundled image's 28x28 pixels as 28 rows of text, one character per pixel by its ink level; it never says which digit the image shows
+
+# One entry per contract.Task; its input and output classes are contract.TASKS's.
+tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
+  digit-math:
+    description: Read the handwritten digits in two images, such as images 4 and 8, and add, subtract or multiply them
+    runner: agent
+    tools: [read_image]
+    reference: null
+    instructions: |-
+      Look. Call read_image for the first image and for the second. Each gives the image's 28 rows of 28 pixels, top to bottom: '.' is blank paper and ':', '-', '=', '+', '*', '#', '%', '@' are ink from faintest to darkest. Each image is one handwritten digit, 0 to 9, from the MNIST dataset; no tool says which.
+      Read. Decide which digit each image shows from the shape of its ink: its loops, strokes and where they start and end. The digits are handwritten, so they can be slanted, thick or thin.
+      Compute. add: first digit + second digit; subtract: first digit - second digit (it can be negative); multiply: first digit * second digit.
+      Submit. Call submit with first and second (the image numbers, as given), the operator (as given), first_digit and second_digit (the digits you read) and result (the operator applied to them). Keep your reasoning short: your reply is limited.
+  show-image:
+    description: Show one of the bundled images, 1 to 100, and the text of its pixels the agent reads; use it whenever the person wants to see an image
+    runner: tool
+    tools: [read_image]
+    reference: null
+    instructions: Call read_image with the image, 1 to 100, and return its rows.
